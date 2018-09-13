@@ -4,12 +4,25 @@
         <!--Bootstrap CSS-->
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous"/>
 
+        <!--Custom Google Font-->
+        <link href="https://fonts.googleapis.com/css?family=Orbitron" rel="stylesheet">
+
         <!--Custom CSS-->
         <link rel="stylesheet" type="text/css" href="assets/css/style.css"/>
         <title>Trivia Game</title>
     </head>
     <body>
-
+        <div class="container mainContent">
+            <h1>Video Game Trivia</h1>
+            <h2 id="clock">Time Remaining: <span id="seconds">25</span> seconds</h2>
+            <h3>Who is the main protagonist in <em>The Legend of Zelda</em>?</h3>
+            <form>
+                <input type="radio" name="option" class="choice" value="A"> Ganon
+                <input type="radio" name="option" class="choice" value="B"> Link
+                <input type="radio" name="option" class="choice" value="C"> Zelda
+                <input type="radio" name="option" class="choice" value="D"> Sara
+            </form>
+        </div>
     </body>
 
     <!--Bootstrap JS and JQuery Links-->

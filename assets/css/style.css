@@ -1,0 +1,23 @@
+body {
+    background-color: black;
+    color: white;
+    font-family: 'Orbitron', sans-serif;
+}
+
+.mainContent {
+    margin: 0 auto;
+    text-align: center;
+}
+
+h1 {
+    text-decoration: underline;
+}
+
+#clock {
+    margin: 50px auto;
+}
+
+.choice {
+    margin-left: 10px;
+    margin-right: 5px;
+}
