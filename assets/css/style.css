@@ -22,11 +22,10 @@ h3 {
     font-weight: bold;
 }
 
-.question {
-    margin: 25px auto;
+label {
+    margin: 0 15px;
 }
 
-.choice {
-    margin-left: 10px;
-    margin-right: 5px;
+input {
+    margin: 0 10px;
 }
