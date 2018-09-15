@@ -7,40 +7,42 @@ var secondsRemaining,
         {
             question: "Who is the main protagonist in \"The Legend of Zelda\"?",
             choices: ["Ganon", "Link", "Sara", "Zelda"],
-            correct: "Link"
+            correct: 1
         },
         {
             question: "What is the maximum number of controllers supported by the PS3 game console??",
             choices: ["2", "4", "7", "9"],
-            correct: "7"
+            correct: 2
         },
         {
             question: "What does NES stand for?",
             choices: ["Nintendo Engagement System", "Nintendo Electronic System", "Nintendo Excellence System", "Nintendo Entertainment System"],
-            correct: "Nintendo Entertainment System"
+            correct: 3
         },
         {
             question: "What is the name of the princess whom Mario repeatedly stops Bowser from kidnapping?",
             choices: ["Princess Pear", "Princess Daisy", "Princess Peach", "Princess Rose"],
-            correct: "Princess Peach"
+            correct: 2
         },
         {
             question: "\"Black Ops\" is a subtitle for what video game series?",
             choices: ["Call of Duty", "Battlefield", "Halo", "Fable"],
-            correct: "Call of Duty"
+            correct: 0
         },
         {
             question: "What are the objects being sought after in the \"Assassins Creed\" games?",
             choices: ["Gems of Knowledge", "Pieces of Eden", "Tokens of the Sages", "Pieces of Heart"],
-            correct: "Pieces of Eden"
+            correct: 1
         },
         {
             question: "Which system was infamous for its \"Red Ring of Death\" (RRoD)?",
             choices: ["Xbox 360", "Playstation 2", "Nintendo Wii", "Sega Saturn"],
-            correct: "Xbox 360"
+            correct: 0
         }
     ],
-    questionNum = 0;
+    questionNum = 0,
+    correctNum = 0,
+    totalNum = triviaQuestions.length;
 
 //Helper function to convert seconds to milliseconds for intervals
 function secToMs(seconds) {
@@ -95,9 +97,11 @@ function createQuestion() {
                 "name": "option",
                 "class": "choice"
             }),
-            label = $("<label>").text(triviaQuestions[questionNum].choices[i]);
+            label = $("<label>").attr("data-choice", [i]).text(triviaQuestions[questionNum].choices[i]);
 
-        $(".answerChoices").append(choice).append(label);
+        $(".answerChoices").append(label);
+
+        $(`[data-choice=${[i]}]`).append(choice);
     }
 
     resetTimer();
@@ -114,6 +118,17 @@ function nextQuestion() {
     createQuestion();
 }
 
+function userGuessed() {
+    var userChoice = $(this).attr("data-choice");
+
+    if (triviaQuestions[questionNum].correct.toString() === userChoice) {
+        console.log(true);
+    } else {
+        console.log(false);
+    }
+}
+
 //Start Game
+$(document).on("click", "label", userGuessed);
 createQuestion();
-timerInterval = setInterval(reduceTimer, secToMs(1));
+//timerInterval = setInterval(reduceTimer, secToMs(1));
