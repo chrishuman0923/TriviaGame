@@ -1,5 +1,6 @@
 var secondsRemaining,
     $timerElem = $("#timer"),
+    $clockElem = $("#clock"),
     timerInterval,
     $triviaAreaElem = $(".triviaArea"),
     triviaQuestions = [
@@ -58,19 +59,25 @@ function reduceTimer() {
     //Reduce seconds by 1
     secondsRemaining -= 1;
 
-    //Update DOM
-    $timerElem.text(secondsRemaining);
-
     //Stop interval when the time has hit 0
-    if (secondsRemaining < 0) {
-        if (questionNum >= triviaQuestions.length) {
-            //Done
-            $triviaAreaElem.text("Done");
-            clearInterval(timerInterval);
-        } else {
+    if (secondsRemaining <= 0) {
+        //Is there another question
+        if (questionNum < triviaQuestions.length-1) {
             nextQuestion();
+        } else {
+            gameOver();
         }
+    } else {
+        //Update DOM
+        $timerElem.text(secondsRemaining);
     }
+}
+
+function gameOver() {
+    //Done
+    clearInterval(timerInterval);
+    $timerElem.text("0");
+    $triviaAreaElem.text("Done");
 }
 
 function createQuestion() {
