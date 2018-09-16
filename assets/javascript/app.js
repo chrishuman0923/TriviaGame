@@ -69,9 +69,11 @@ function reduceTimer() {
 
     //Stop interval when the time has hit 0
     if (secondsRemaining <= 0) {
+        disableBackgroundProcesses();
+
         //Is there another question
         if (questionNum < triviaQuestions.length-1) {
-            nextQuestion();
+            timesUp();
         } else {
             gameOver();
         }
@@ -90,7 +92,6 @@ function gameOver() {
     scoreElem = $("<p>").text(`Score: ${score}`);
     
     //Update game area by hiding and updating relevant objects
-    clearInterval(timerInterval);
     $clockElem.hide();
     $triviaAreaElem.html([correctElem, incorrectElem, scoreElem]);
 
@@ -149,20 +150,20 @@ function nextQuestion() {
 function userGuessed() {
     var userChoice = $(this).attr("data-choice");
 
+    //Hide timer and stop background processes
+    $clockElem.hide();
+    disableBackgroundProcesses();
+
     if (triviaQuestions[questionNum].correct === userChoice) {
         //correct guess
         correctUserGuess();
     } else {
         incorrectUserGuess();
     }
-
-    //Hide timer and clear interval
-    $clockElem.hide();
-    clearInterval(timerInterval);
 }
 
 function correctUserGuess() {
-    correctElem = $("<p>").text("Correct!");
+    correctElem = $("<p>").text("Correct!").addClass("correctAnswer");
 
     //increment number of correct answers
     correctNum += 1;
@@ -171,31 +172,61 @@ function correctUserGuess() {
 
     //Is there another question
     if (questionNum < triviaQuestions.length-1) {
+        //re-enable game
+        setTimeout(enableBackgroundProcesses, secToMs(3));
         setTimeout(nextQuestion, secToMs(3));
     } else {
         setTimeout(gameOver, secToMs(3));
     }
+}
 
-    //restart clock with other functions above
-    setTimeout(restartClock, secToMs(3));
+//user doesn't answer in time
+function timesUp() {
+    //Hide timer
+    $clockElem.hide();
+
+    incorrectElem = $("<p>").text("Time's Up!").addClass("incorrectAnswer");
+    $("[data-answer='true']").addClass("correctAnswer");
+
+    //Prepend message to DOM
+    $triviaAreaElem.prepend(incorrectElem);
+
+    //Is there another question
+    if (questionNum < triviaQuestions.length-1) {
+        //re-enable game
+        setTimeout(enableBackgroundProcesses, secToMs(3));
+        setTimeout(nextQuestion, secToMs(3));
+    } else {
+        setTimeout(gameOver, secToMs(3));
+    }
 }
 
 function incorrectUserGuess() {
     $("[data-answer='true']").addClass("correctAnswer");
     $("input:checked").closest("label").addClass("incorrectAnswer");
+    incorrectElem = $("<p>").text("Incorrect!").addClass("incorrectAnswer");
+
+    //Prepend message to DOM
+    $triviaAreaElem.prepend(incorrectElem);
 
     //Is there another question
     if (questionNum < triviaQuestions.length-1) {
+        //re-enable game
+        setTimeout(enableBackgroundProcesses, secToMs(3));
         setTimeout(nextQuestion, secToMs(3));
     } else {
         setTimeout(gameOver, secToMs(3));
     }
-
-    //restart clock with other functions above
-    setTimeout(restartClock, secToMs(3));
 }
 
 function startGame() {
+    //if timer is hidden, show it
+    if ($clockElem.not(':visible')) {
+        $clockElem.show();
+    }
+
+    enableBackgroundProcesses();
+
     //clear DOM area
     $triviaAreaElem.empty();
 
@@ -206,9 +237,8 @@ function startGame() {
     //show question area
     $mainContentArea.show();
 
-    //set interval and question
+    //set question
     createQuestion();
-    timerInterval = setInterval(reduceTimer, secToMs(1));
 }
 
 function resetGame() {
@@ -219,13 +249,19 @@ function resetGame() {
     startGame();    
 }
 
-//separate function so the interval can be restarted with a delay to match other behavior of the game
-function restartClock() {
+//starts interval and adds click handler
+function enableBackgroundProcesses() {
+    $(document).on("click", "label", userGuessed);
     resetTimer();
     timerInterval = setInterval(reduceTimer, secToMs(1));
 }
 
+//stops interval and removes click handler
+function disableBackgroundProcesses() {
+    $(document).off("click", "label", userGuessed);
+    clearInterval(timerInterval);
+}
+
 //set click events
-$(document).on("click", "label", userGuessed);
 $startBtn.on("click", startGame);
 $restartBtn.on("click", resetGame);
