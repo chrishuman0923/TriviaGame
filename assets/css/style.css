@@ -38,12 +38,11 @@ h2 {
 
 .answerChoices {
     text-align: left;
-    list-style-position: outside;
     margin: 15px auto;
 }
 
 label {
-    margin: 15px 15px 15px 0;
+    margin: 15px 0;
 }
 
 input {
@@ -71,4 +70,14 @@ button:hover, label:hover {
 
 #restartBtn {
     display: none;
+}
+
+.correctAnswer {
+    color: green;
+    font-weight: bold;
+}
+
+.incorrectAnswer {
+    color: red;
+    font-weight: bold;
 }
