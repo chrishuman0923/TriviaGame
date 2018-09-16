@@ -249,7 +249,7 @@ function resetGame() {
     startGame();    
 }
 
-//starts interval and adds click handler
+//starts interval, resets timer and adds click handler
 function enableBackgroundProcesses() {
     $(document).on("click", "label", userGuessed);
     resetTimer();
