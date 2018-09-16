@@ -47,7 +47,8 @@ var $mainContentArea = $(".mainContent"),
     $startBtn = $("#startBtn"),
     $restartBtn = $("#restartBtn"),
     correctElem,
-    incorrectElem;
+    incorrectElem,
+    scoreElem;
 
 //Helper function to convert seconds to milliseconds for intervals
 function secToMs(seconds) {
@@ -81,14 +82,17 @@ function reduceTimer() {
 }
 
 function gameOver() {
-    var incorrectNum = totalNum - correctNum;
+    var incorrectNum = totalNum - correctNum,
+        score = ((correctNum / totalNum) * 100).toFixed(2) + "%";
 
-    correctElem = $("<p>").text(`Number Correct: ${correctNum}`);
-    incorrectElem = $("<p>").text(`Number Incorrect: ${incorrectNum}`);
+    correctElem = $("<p>").text(`Number Correct: ${correctNum}`).addClass("correctAnswer");
+    incorrectElem = $("<p>").text(`Number Incorrect: ${incorrectNum}`).addClass("incorrectAnswer");
+    scoreElem = $("<p>").text(`Score: ${score}`);
     
+    //Update game area by hiding and updating relevant objects
     clearInterval(timerInterval);
-    $timerElem.text("0");
-    $triviaAreaElem.html([correctElem, incorrectElem]);
+    $clockElem.hide();
+    $triviaAreaElem.html([correctElem, incorrectElem, scoreElem]);
 
     $restartBtn.show();
 }
@@ -109,6 +113,7 @@ function createQuestion() {
             }),
             label = $("<label>").attr("data-choice", [i]);
         
+        //Adds attribute to identify which choice is correct and which are wrong
         if (i.toString() === triviaQuestions[questionNum].correct) {
             label.attr("data-answer", "true");
         } else {
@@ -151,8 +156,9 @@ function userGuessed() {
         incorrectUserGuess();
     }
 
-    //Hide timer
+    //Hide timer and clear interval
     $clockElem.hide();
+    clearInterval(timerInterval);
 }
 
 function correctUserGuess() {
@@ -169,6 +175,9 @@ function correctUserGuess() {
     } else {
         setTimeout(gameOver, secToMs(3));
     }
+
+    //restart clock with other functions above
+    setTimeout(restartClock, secToMs(3));
 }
 
 function incorrectUserGuess() {
@@ -181,6 +190,9 @@ function incorrectUserGuess() {
     } else {
         setTimeout(gameOver, secToMs(3));
     }
+
+    //restart clock with other functions above
+    setTimeout(restartClock, secToMs(3));
 }
 
 function startGame() {
@@ -205,6 +217,12 @@ function resetGame() {
     correctNum = 0;
 
     startGame();    
+}
+
+//separate function so the interval can be restarted with a delay to match other behavior of the game
+function restartClock() {
+    resetTimer();
+    timerInterval = setInterval(reduceTimer, secToMs(1));
 }
 
 //set click events
