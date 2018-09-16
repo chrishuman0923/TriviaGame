@@ -1,4 +1,5 @@
-var secondsRemaining,
+var $mainContentArea = $(".mainContent"),
+    secondsRemaining,
     $timerElem = $("#timer"),
     $clockElem = $("#clock"),
     timerInterval,
@@ -7,42 +8,44 @@ var secondsRemaining,
         {
             question: "Who is the main protagonist in \"The Legend of Zelda\"?",
             choices: ["Ganon", "Link", "Sara", "Zelda"],
-            correct: 1
+            correct: "1"
         },
         {
-            question: "What is the maximum number of controllers supported by the PS3 game console??",
+            question: "What is the maximum number of controllers supported by the PS3 game console?",
             choices: ["2", "4", "7", "9"],
-            correct: 2
+            correct: "2"
         },
         {
             question: "What does NES stand for?",
             choices: ["Nintendo Engagement System", "Nintendo Electronic System", "Nintendo Excellence System", "Nintendo Entertainment System"],
-            correct: 3
+            correct: "3"
         },
         {
             question: "What is the name of the princess whom Mario repeatedly stops Bowser from kidnapping?",
             choices: ["Princess Pear", "Princess Daisy", "Princess Peach", "Princess Rose"],
-            correct: 2
+            correct: "2"
         },
         {
             question: "\"Black Ops\" is a subtitle for what video game series?",
             choices: ["Call of Duty", "Battlefield", "Halo", "Fable"],
-            correct: 0
+            correct: "0"
         },
         {
             question: "What are the objects being sought after in the \"Assassins Creed\" games?",
             choices: ["Gems of Knowledge", "Pieces of Eden", "Tokens of the Sages", "Pieces of Heart"],
-            correct: 1
+            correct: "1"
         },
         {
             question: "Which system was infamous for its \"Red Ring of Death\" (RRoD)?",
             choices: ["Xbox 360", "Playstation 2", "Nintendo Wii", "Sega Saturn"],
-            correct: 0
+            correct: "0"
         }
     ],
     questionNum = 0,
     correctNum = 0,
-    totalNum = triviaQuestions.length;
+    totalNum = triviaQuestions.length,
+    $startBtn = $("#startBtn"),
+    $restartBtn = $("#restartBtn");
 
 //Helper function to convert seconds to milliseconds for intervals
 function secToMs(seconds) {
@@ -51,7 +54,7 @@ function secToMs(seconds) {
 
 function resetTimer() {
     //Reset timer to original value
-    secondsRemaining = 2;
+    secondsRemaining = 10;
 
     //Update DOM
     $timerElem.text(secondsRemaining);
@@ -76,19 +79,23 @@ function reduceTimer() {
 }
 
 function gameOver() {
-    //Done
+    var incorrectNum = totalNum - correctNum,
+        correctElem = $("<p>").text(`Number Correct: ${correctNum}`),
+        incorrectElem = $("<p>").text(`Number Incorrect: ${incorrectNum}`);
+    
     clearInterval(timerInterval);
     $timerElem.text("0");
-    $triviaAreaElem.text("Done");
+    $triviaAreaElem.html([correctElem, incorrectElem]);
+
+    $restartBtn.show();
 }
 
 function createQuestion() {
-    var container = $("<div>").addClass("question"),
-        question = $("<h3>").text(triviaQuestions[questionNum].question),
+    var question = $("<h2>").text(triviaQuestions[questionNum].question),
         form = $("<form>").addClass("answerChoices");
 
     //Append elements to DOM
-    $triviaAreaElem.append(container).append(question).append(form);
+    $triviaAreaElem.append([question, form]);
     
     //Loop through, create and append answer choices onto DOM
     for (var i = 0; i < triviaQuestions[questionNum].choices.length; i++) {
@@ -97,11 +104,13 @@ function createQuestion() {
                 "name": "option",
                 "class": "choice"
             }),
-            label = $("<label>").attr("data-choice", [i]).text(triviaQuestions[questionNum].choices[i]);
+            label = $("<label>").attr("data-choice", [i]);
 
+        //Appends the label to the DOM
         $(".answerChoices").append(label);
 
-        $(`[data-choice=${[i]}]`).append(choice);
+        //Appends choice within the label that was created
+        $(`[data-choice=${[i]}]`).append([choice, triviaQuestions[questionNum].choices[i]], "<br/>");
     }
 
     resetTimer();
@@ -121,14 +130,44 @@ function nextQuestion() {
 function userGuessed() {
     var userChoice = $(this).attr("data-choice");
 
-    if (triviaQuestions[questionNum].correct.toString() === userChoice) {
-        console.log(true);
+    if (triviaQuestions[questionNum].correct === userChoice) {
+        //correct guess
+        correctNum += 1;
+    }
+
+    //Is there another question
+    if (questionNum < triviaQuestions.length-1) {
+        nextQuestion();
     } else {
-        console.log(false);
+        gameOver();
     }
 }
 
-//Start Game
+function startGame() {
+    //clear DOM area
+    $triviaAreaElem.empty();
+    
+    //hide start button
+    $startBtn.hide();
+    $restartBtn.hide();
+
+    //show question area
+    $mainContentArea.show();
+
+    //set interval and question
+    createQuestion();
+    timerInterval = setInterval(reduceTimer, secToMs(1));
+}
+
+function resetGame() {
+    //reset variables
+    questionNum = 0;
+    correctNum = 0;
+
+    startGame();    
+}
+
+//set click events
 $(document).on("click", "label", userGuessed);
-createQuestion();
-//timerInterval = setInterval(reduceTimer, secToMs(1));
+$startBtn.on("click", startGame);
+$restartBtn.on("click", resetGame);
