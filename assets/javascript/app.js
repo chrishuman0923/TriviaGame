@@ -45,7 +45,9 @@ var $mainContentArea = $(".mainContent"),
     correctNum = 0,
     totalNum = triviaQuestions.length,
     $startBtn = $("#startBtn"),
-    $restartBtn = $("#restartBtn");
+    $restartBtn = $("#restartBtn"),
+    correctElem,
+    incorrectElem;
 
 //Helper function to convert seconds to milliseconds for intervals
 function secToMs(seconds) {
@@ -79,9 +81,10 @@ function reduceTimer() {
 }
 
 function gameOver() {
-    var incorrectNum = totalNum - correctNum,
-        correctElem = $("<p>").text(`Number Correct: ${correctNum}`),
-        incorrectElem = $("<p>").text(`Number Incorrect: ${incorrectNum}`);
+    var incorrectNum = totalNum - correctNum;
+
+    correctElem = $("<p>").text(`Number Correct: ${correctNum}`);
+    incorrectElem = $("<p>").text(`Number Incorrect: ${incorrectNum}`);
     
     clearInterval(timerInterval);
     $timerElem.text("0");
@@ -105,6 +108,12 @@ function createQuestion() {
                 "class": "choice"
             }),
             label = $("<label>").attr("data-choice", [i]);
+        
+        if (i.toString() === triviaQuestions[questionNum].correct) {
+            label.attr("data-answer", "true");
+        } else {
+            label.attr("data-answer", "false");
+        }
 
         //Appends the label to the DOM
         $(".answerChoices").append(label);
@@ -117,6 +126,11 @@ function createQuestion() {
 }
 
 function nextQuestion() {
+    //if timer is hidden, show it
+    if ($clockElem.not(':visible')) {
+        $clockElem.show();
+     }
+
     //increment question number to keep track of what question to display
     questionNum += 1;
 
@@ -132,21 +146,47 @@ function userGuessed() {
 
     if (triviaQuestions[questionNum].correct === userChoice) {
         //correct guess
-        correctNum += 1;
+        correctUserGuess();
+    } else {
+        incorrectUserGuess();
     }
+
+    //Hide timer
+    $clockElem.hide();
+}
+
+function correctUserGuess() {
+    correctElem = $("<p>").text("Correct!");
+
+    //increment number of correct answers
+    correctNum += 1;
+    
+    $triviaAreaElem.html(correctElem);
 
     //Is there another question
     if (questionNum < triviaQuestions.length-1) {
-        nextQuestion();
+        setTimeout(nextQuestion, secToMs(3));
     } else {
-        gameOver();
+        setTimeout(gameOver, secToMs(3));
+    }
+}
+
+function incorrectUserGuess() {
+    $("[data-answer='true']").addClass("correctAnswer");
+    $("input:checked").closest("label").addClass("incorrectAnswer");
+
+    //Is there another question
+    if (questionNum < triviaQuestions.length-1) {
+        setTimeout(nextQuestion, secToMs(3));
+    } else {
+        setTimeout(gameOver, secToMs(3));
     }
 }
 
 function startGame() {
     //clear DOM area
     $triviaAreaElem.empty();
-    
+
     //hide start button
     $startBtn.hide();
     $restartBtn.hide();
