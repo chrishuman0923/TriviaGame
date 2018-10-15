@@ -1,6 +1,6 @@
 # Trivia Game
 
-A video game themed trivia game demonstrating the use of jquery and intervals to manipulate DOM objects.
+A video game themed trivia game demonstrating the use of jquery and intervals to manipulate DOM objects. You can view the deployed project [here](https://chrishuman0923.github.io/TriviaGame/).
 
 # Game Rules
 
