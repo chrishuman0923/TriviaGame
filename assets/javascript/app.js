@@ -1,10 +1,10 @@
-var $mainContentArea = $(".mainContent"),
+var $mainContent = $(".mainContent"),
     secondsRemaining,
-    $timerElem = $("#timer"),
-    $clockElem = $("#clock"),
+    $timer = $("#timer"),
+    $clock = $("#clock"),
     timerInterval,
-    $triviaAreaElem = $(".triviaArea"),
-    triviaQuestions = [
+    $triviaArea = $(".triviaArea"),
+    questions = [
         {
             question: "Who is the main protagonist in \"The Legend of Zelda\"?",
             choices: ["Ganon", "Link", "Sara", "Zelda"],
@@ -43,7 +43,7 @@ var $mainContentArea = $(".mainContent"),
     ],
     questionNum = 0,
     correctNum = 0,
-    totalNum = triviaQuestions.length,
+    totalNum = questions.length,
     $startBtn = $("#startBtn"),
     $restartBtn = $("#restartBtn"),
     correctElem,
@@ -60,7 +60,7 @@ function resetTimer() {
     secondsRemaining = 10;
 
     //Update DOM
-    $timerElem.text(secondsRemaining);
+    $timer.text(secondsRemaining);
 }
 
 function reduceTimer() {
@@ -72,14 +72,14 @@ function reduceTimer() {
         disableBackgroundProcesses();
 
         //Is there another question
-        if (questionNum < triviaQuestions.length-1) {
+        if (questionNum < questions.length-1) {
             timesUp();
         } else {
             gameOver();
         }
     } else {
         //Update DOM
-        $timerElem.text(secondsRemaining);
+        $timer.text(secondsRemaining);
     }
 }
 
@@ -87,26 +87,26 @@ function gameOver() {
     var incorrectNum = totalNum - correctNum,
         score = ((correctNum / totalNum) * 100).toFixed(2) + "%";
 
-    correctElem = $("<p>").text(`Number Correct: ${correctNum}`).addClass("correctAnswer");
-    incorrectElem = $("<p>").text(`Number Incorrect: ${incorrectNum}`).addClass("incorrectAnswer");
-    scoreElem = $("<p>").text(`Score: ${score}`);
+    correctElem = $("<p>").text('Number Correct: ' + correctNum).addClass("correctAnswer");
+    incorrectElem = $("<p>").text('Number Incorrect: ' + incorrectNum).addClass("incorrectAnswer");
+    scoreElem = $("<p>").text('Score: ' + score);
     
     //Update game area by hiding and updating relevant objects
-    $clockElem.hide();
-    $triviaAreaElem.html([correctElem, incorrectElem, scoreElem]);
+    $clock.hide();
+    $triviaArea.html([correctElem, incorrectElem, scoreElem]);
 
     $restartBtn.show();
 }
 
 function createQuestion() {
-    var question = $("<h2>").text(triviaQuestions[questionNum].question),
+    var question = $("<h2>").text(questions[questionNum].question),
         form = $("<form>").addClass("answerChoices");
 
     //Append elements to DOM
-    $triviaAreaElem.append([question, form]);
+    $triviaArea.append([question, form]);
     
     //Loop through, create and append answer choices onto DOM
-    for (var i = 0; i < triviaQuestions[questionNum].choices.length; i++) {
+    for (var i = 0; i < questions[questionNum].choices.length; i++) {
         var choice = $("<input>").attr({
                 "type": "radio",
                 "name": "option",
@@ -115,7 +115,7 @@ function createQuestion() {
             label = $("<label>").attr("data-choice", [i]);
         
         //Adds attribute to identify which choice is correct and which are wrong
-        if (i.toString() === triviaQuestions[questionNum].correct) {
+        if (i.toString() === questions[questionNum].correct) {
             label.attr("data-answer", "true");
         } else {
             label.attr("data-answer", "false");
@@ -125,7 +125,7 @@ function createQuestion() {
         $(".answerChoices").append(label);
 
         //Appends choice within the label that was created
-        $(`[data-choice=${[i]}]`).append([choice, triviaQuestions[questionNum].choices[i]], "<br/>");
+        $('[data-choice=' + [i] + ']').append([choice, questions[questionNum].choices[i]], "<br/>");
     }
 
     resetTimer();
@@ -133,15 +133,15 @@ function createQuestion() {
 
 function nextQuestion() {
     //if timer is hidden, show it
-    if ($clockElem.not(':visible')) {
-        $clockElem.show();
+    if ($clock.not(':visible')) {
+        $clock.show();
      }
 
     //increment question number to keep track of what question to display
     questionNum += 1;
 
     //clear DOM area
-    $triviaAreaElem.empty();
+    $triviaArea.empty();
 
     //Show next question
     createQuestion();
@@ -151,10 +151,10 @@ function userGuessed() {
     var userChoice = $(this).attr("data-choice");
 
     //Hide timer and stop background processes
-    $clockElem.hide();
+    $clock.hide();
     disableBackgroundProcesses();
 
-    if (triviaQuestions[questionNum].correct === userChoice) {
+    if (questions[questionNum].correct === userChoice) {
         //correct guess
         correctUserGuess();
     } else {
@@ -168,10 +168,10 @@ function correctUserGuess() {
     //increment number of correct answers
     correctNum += 1;
     
-    $triviaAreaElem.html(correctElem);
+    $triviaArea.html(correctElem);
 
     //Is there another question
-    if (questionNum < triviaQuestions.length-1) {
+    if (questionNum < questions.length-1) {
         //re-enable game
         setTimeout(enableBackgroundProcesses, secToMs(3));
         setTimeout(nextQuestion, secToMs(3));
@@ -183,16 +183,16 @@ function correctUserGuess() {
 //user doesn't answer in time
 function timesUp() {
     //Hide timer
-    $clockElem.hide();
+    $clock.hide();
 
     incorrectElem = $("<p>").text("Time's Up!").addClass("incorrectAnswer");
     $("[data-answer='true']").addClass("correctAnswer");
 
     //Prepend message to DOM
-    $triviaAreaElem.prepend(incorrectElem);
+    $triviaArea.prepend(incorrectElem);
 
     //Is there another question
-    if (questionNum < triviaQuestions.length-1) {
+    if (questionNum < questions.length-1) {
         //re-enable game
         setTimeout(enableBackgroundProcesses, secToMs(3));
         setTimeout(nextQuestion, secToMs(3));
@@ -207,10 +207,10 @@ function incorrectUserGuess() {
     incorrectElem = $("<p>").text("Incorrect!").addClass("incorrectAnswer");
 
     //Prepend message to DOM
-    $triviaAreaElem.prepend(incorrectElem);
+    $triviaArea.prepend(incorrectElem);
 
     //Is there another question
-    if (questionNum < triviaQuestions.length-1) {
+    if (questionNum < questions.length-1) {
         //re-enable game
         setTimeout(enableBackgroundProcesses, secToMs(3));
         setTimeout(nextQuestion, secToMs(3));
@@ -221,21 +221,21 @@ function incorrectUserGuess() {
 
 function startGame() {
     //if timer is hidden, show it
-    if ($clockElem.not(':visible')) {
-        $clockElem.show();
+    if ($clock.not(':visible')) {
+        $clock.show();
     }
 
     enableBackgroundProcesses();
 
     //clear DOM area
-    $triviaAreaElem.empty();
+    $triviaArea.empty();
 
     //hide start button
     $startBtn.hide();
     $restartBtn.hide();
 
     //show question area
-    $mainContentArea.show();
+    $mainContent.show();
 
     //set question
     createQuestion();
