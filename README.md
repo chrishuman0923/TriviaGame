@@ -19,6 +19,7 @@ All of the game behavior and functionality takes place without the browser windo
 ## Technologies Used
 - HTML 5
 - CSS 3
+- Google Fonts
 - Javascript
 - JQuery
 - Intervals
